@@ -12,14 +12,14 @@ public class FreeCamera : MonoBehaviour {
 	float	m_yaw;
 	float	m_pitch;
 	
-	void Awake() {
-		enabled = enableInputCapture;
-	}
-
-	void OnValidate() {
-		if(Application.isPlaying)
-			enabled = enableInputCapture;
-	}
+//	void Awake() {
+//		enabled = enableInputCapture;
+//	}
+//
+//	void OnValidate() {
+//		if(Application.isPlaying)
+//			enabled = enableInputCapture;
+//	}
 
 	void CaptureInput() {
 		Cursor.lockState = CursorLockMode.Locked;
@@ -42,7 +42,8 @@ public class FreeCamera : MonoBehaviour {
 			ReleaseInput();
 	}
 
-	void Update() {
+	void Update()
+	{
 		if(!m_inputCaptured) {
 			if(!holdRightMouseCapture && Input.GetMouseButtonDown(0)) 
 				CaptureInput();

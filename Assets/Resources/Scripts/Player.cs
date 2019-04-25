@@ -1,21 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.UI;
 using UnityEngine.Video;
-using UnityEngine.Rendering.PostProcessing;
 
 public class Player : MonoBehaviour
 {
     public Image Loading;
     public Step FirstStep;
     public VideoPlayer VideoPlayer;
+
     private float _transitionDuration = 0.5f;
     private float _timer;
     private float delay = 1.5f;
     private StepTrigger _currentStepTrigger;
     
-    private Vignette _vignette;
+//    private Vignette _vignette;
     private ColorGrading _colorGrading;
     
     private int _index;
@@ -24,7 +25,6 @@ public class Player : MonoBehaviour
     private void Start()
     {
         var pp = GetComponent<PostProcessVolume>().profile;
-        pp.TryGetSettings(out _vignette);
         pp.TryGetSettings(out _colorGrading);
         FirstStep.gameObject.SetActive(true);
         FirstStep.Activate(this);
@@ -70,29 +70,23 @@ public class Player : MonoBehaviour
         _transitioning = true;
         var ev0 = 0f;
         var ev1 = -15f;
-        var v0 = 0f;
-        var v1 = 1f;
         _currentStepTrigger.GotoNextStep(this);
         for (var t = 0f; t < _transitionDuration; t += Time.deltaTime)
         {
             _colorGrading.postExposure.value = Mathf.Lerp(ev0, ev1, t / _transitionDuration);
-            _vignette.intensity.value = Mathf.Lerp(v0, v1, t / _transitionDuration);
             if (VideoPlayer.isPrepared && t > 0.25f)
                 break;
             yield return null;
         }
         _colorGrading.postExposure.value = ev1;
-        _vignette.intensity.value = v1;
         yield return new WaitUntil(() => VideoPlayer.isPrepared);
         var rt = _transitionDuration * 0.65f;
         for (var t = 0f; t < rt; t += Time.deltaTime)
         {
             _colorGrading.postExposure.value = Mathf.Lerp(ev1, ev0, t / rt);
-            _vignette.intensity.value = Mathf.Lerp(v1, v0, t / rt);
             yield return null;
         }
         _colorGrading.postExposure.value = ev0;
-        _vignette.intensity.value = v0;
         _transitioning = false;
     }
 }
