@@ -6,15 +6,27 @@ using UnityEngine.Video;
 public class EditorDebug : MonoBehaviour
 {
     public VideoClip VideoClip;
-    public VideoPlayer VideoPlayer;
-    // Update is called once per frame
-    private void Update()
+
+    private void OnEnable()
     {
+        if (Application.isPlaying)
+            return;
         print("Switched to " + VideoClip.name);
+        var player = GetComponent<Player>();
         var skybox = GetComponent<Skybox>();
-        VideoPlayer.clip = VideoClip;
-        VideoPlayer.Play();
+        player.VideoPlayer.clip = VideoClip;
+        player.VideoPlayer.Play();
         RenderSettings.skybox = skybox.material;
+    }
+
+    private void OnDisable()
+    {
+        if (Application.isPlaying)
+            return;
+        var player = GetComponent<Player>();
+        player.VideoPlayer.Stop();
+        RenderSettings.skybox = null;
+        player.FixRenderTex();
     }
 }
 #endif

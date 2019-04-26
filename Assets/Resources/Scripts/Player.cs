@@ -8,12 +8,11 @@ using UnityEngine.Video;
 public class Player : MonoBehaviour
 {
     public Image Loading;
-    public Step FirstStep;
     public VideoPlayer VideoPlayer;
 
     private float _transitionDuration = 0.5f;
     private float _timer;
-    private float delay = 1.5f;
+    private float delay = 2.25f;
     private StepTrigger _currentStepTrigger;
     
 //    private Vignette _vignette;
@@ -26,8 +25,8 @@ public class Player : MonoBehaviour
     {
         var pp = GetComponent<PostProcessVolume>().profile;
         pp.TryGetSettings(out _colorGrading);
-        FirstStep.gameObject.SetActive(true);
-        FirstStep.Activate(this);
+        //FirstStep.gameObject.SetActive(true);
+        //FirstStep.Activate(this);
     }
 
     // Update is called once per frame
@@ -74,7 +73,7 @@ public class Player : MonoBehaviour
         for (var t = 0f; t < _transitionDuration; t += Time.deltaTime)
         {
             _colorGrading.postExposure.value = Mathf.Lerp(ev0, ev1, t / _transitionDuration);
-            if (VideoPlayer.isPrepared && t > 0.25f)
+            if (VideoPlayer.isPrepared && t > 0.1f)
                 break;
             yield return null;
         }
@@ -88,5 +87,18 @@ public class Player : MonoBehaviour
         }
         _colorGrading.postExposure.value = ev0;
         _transitioning = false;
+    }
+
+    public void FixRenderTex()
+    {
+        var rt = RenderTexture.active;
+        RenderTexture.active = GetComponent<Skybox>().material.mainTexture as RenderTexture;
+        GL.Clear(true, true, Color.clear);
+        RenderTexture.active = rt;
+    }
+
+    private void OnDestroy()
+    {
+        FixRenderTex();
     }
 }
